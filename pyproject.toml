@@ -1,0 +1,26 @@
+[project]
+name = "expo-summit-api"
+version = "0.1.0"
+description = "Dubai Expo AI Summit backend API"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "sqlalchemy[asyncio]>=2.0",
+  "aiosqlite>=0.20",
+  "asyncpg>=0.29",
+  "pydantic[email]>=2.8",
+  "pydantic-settings>=2.4",
+  "pyjwt>=2.9",
+  "argon2-cffi>=23.1",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "httpx>=0.27", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
