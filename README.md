@@ -17,7 +17,7 @@ uv run uvicorn app.main:app --reload
 ```
 API docs: http://localhost:8000/docs
 
-Demo data is seeded on first start. Demo admin: `admin@expo.test` / `admin12345`.
+Demo data is seeded on first start. Demo admin: `admin@expo-summit.dev` / `admin12345`.
 
 In development, verify and reset tokens are returned in the API response because no email service is wired yet (`EXPOSE_DEV_TOKENS=false` to disable).
 

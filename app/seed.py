@@ -32,7 +32,7 @@ async def seed() -> None:
             return
         db.add(
             User(
-                email="admin@expo.test",
+                email="admin@expo-summit.dev",
                 password_hash=hash_password("admin12345"),
                 name="Summit Admin",
                 role="admin",
