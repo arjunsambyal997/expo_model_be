@@ -8,12 +8,19 @@ dependencies = [
   "uvicorn[standard]>=0.30",
   "sqlalchemy[asyncio]>=2.0",
   "aiosqlite>=0.20",
-  "asyncpg>=0.29",
   "pydantic[email]>=2.8",
   "pydantic-settings>=2.4",
   "pyjwt>=2.9",
   "argon2-cffi>=23.1",
 ]
+
+[project.optional-dependencies]
+postgres = ["asyncpg>=0.29"]
+
+[tool.uv.sources]
+# Pure-Python wheel: avoids the compiled Cython extensions, which some Windows
+# Application Control policies block.
+sqlalchemy = { url = "https://files.pythonhosted.org/packages/a3/1e/6eba6770b626a991e58de306385d414b9f3ae780ae60c61aa1d0841dcaaf/sqlalchemy-2.1.8-py3-none-any.whl" }
 
 [dependency-groups]
 dev = ["pytest>=8", "pytest-asyncio>=0.24", "httpx>=0.27", "ruff>=0.6"]

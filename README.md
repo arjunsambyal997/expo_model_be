@@ -17,6 +17,11 @@ uv run uvicorn app.main:app --reload
 ```
 API docs: http://localhost:8000/docs
 
+### Windows
+SQLAlchemy is pinned to its pure-Python wheel (see `[tool.uv.sources]` in `pyproject.toml`), so no compiled SQLAlchemy extensions are loaded. This avoids `DLL load failed ... An Application Control policy has blocked this file` on locked-down Windows machines. After pulling, run `uv sync` once; it replaces the compiled build already in `.venv`.
+
+PostgreSQL support (`asyncpg`, a compiled package) is optional: `uv sync --extra postgres`.
+
 Demo data is seeded on first start. Demo logins (also shown on the sign-in page): `demo@expo-summit.dev` / `demo12345`, admin `admin@expo-summit.dev` / `admin12345`.
 
 In development, verify and reset tokens are returned in the API response because no email service is wired yet (`EXPOSE_DEV_TOKENS=false` to disable).
