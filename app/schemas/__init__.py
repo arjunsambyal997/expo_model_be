@@ -65,32 +65,19 @@ class UserUpdate(BaseModel):
     interests: str | None = None
 
 
-class SpeakerOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    name: str
-    title: str
-    company: str
-    bio: str
-    featured: bool
+class IdeaIn(BaseModel):
+    title: str = Field(min_length=3, max_length=160)
+    description: str = Field(min_length=10, max_length=5000)
 
 
-class TalkOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class IdeaOut(BaseModel):
     id: int
     title: str
     description: str
-    track: str
-    room: str
-    day: int
-    starts_at: datetime
-    ends_at: datetime
-    speakers: list[SpeakerOut]
-    saved: bool = False
-
-
-class SpeakerDetail(SpeakerOut):
-    talks: list[TalkOut] = []
+    author_name: str
+    created_at: datetime
+    votes: int
+    voted: bool = False
 
 
 class RoleUpdate(BaseModel):

@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Table, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
@@ -44,44 +44,22 @@ class ResetToken(Base):
     purpose: Mapped[str] = mapped_column(String(20), default="reset")  # reset | verify
 
 
-session_speakers = Table(
-    "session_speakers",
-    Base.metadata,
-    Column("session_id", ForeignKey("talks.id", ondelete="CASCADE"), primary_key=True),
-    Column("speaker_id", ForeignKey("speakers.id", ondelete="CASCADE"), primary_key=True),
-)
-
-saved_sessions = Table(
-    "saved_sessions",
-    Base.metadata,
-    Column("user_id", ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
-    Column("session_id", ForeignKey("talks.id", ondelete="CASCADE"), primary_key=True),
-)
-
-
-class Speaker(Base):
-    __tablename__ = "speakers"
+class Idea(Base):
+    __tablename__ = "ideas"
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(120))
-    title: Mapped[str] = mapped_column(String(160), default="")
-    company: Mapped[str] = mapped_column(String(160), default="")
-    bio: Mapped[str] = mapped_column(Text, default="")
-    featured: Mapped[bool] = mapped_column(Boolean, default=False)
-    talks: Mapped[list["Talk"]] = relationship(
-        secondary=session_speakers, back_populates="speakers", lazy="selectin"
+    title: Mapped[str] = mapped_column(String(160))
+    description: Mapped[str] = mapped_column(Text)
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    author: Mapped[User] = relationship(lazy="selectin")
+
+
+class IdeaVote(Base):
+    __tablename__ = "idea_votes"
+    # composite primary key = one vote per user per idea
+    idea_id: Mapped[int] = mapped_column(
+        ForeignKey("ideas.id", ondelete="CASCADE"), primary_key=True
     )
-
-
-class Talk(Base):
-    __tablename__ = "talks"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(200))
-    description: Mapped[str] = mapped_column(Text, default="")
-    track: Mapped[str] = mapped_column(String(60), default="Talk")
-    room: Mapped[str] = mapped_column(String(60), default="")
-    day: Mapped[int] = mapped_column(default=1)
-    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    speakers: Mapped[list[Speaker]] = relationship(
-        secondary=session_speakers, back_populates="talks", lazy="selectin"
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
