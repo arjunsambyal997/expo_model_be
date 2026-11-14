@@ -1,6 +1,6 @@
 # Expo AI Summit API
 
-FastAPI backend for the Dubai Expo AI Summit ideas app. The app is a place for the team to collect ideas for what to build for the summit and vote on them, so the best ones get picked.
+FastAPI backend for the Idea Board ideas app. The app is a place for the team to collect ideas for what to build and vote on them, so the best ones get picked.
 
 ## Features
 - Auth: sign up, email verification, sign in, refresh (rotating), sign out, sign out everywhere, forgot/reset password, change password

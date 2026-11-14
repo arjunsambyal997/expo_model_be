@@ -31,7 +31,7 @@ async def seed() -> None:
         db.add_all([demo, admin])
         await db.flush()
         idea = Idea(
-            title="Example: AI concierge for summit visitors",
+            title="Example: AI concierge for first-time visitors",
             description=(
                 "A sample idea to show how this works. Describe the problem, who it is for "
                 "and what we would build, then let the team vote on it."
