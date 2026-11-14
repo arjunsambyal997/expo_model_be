@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, summit, users
+from app.api.v1 import auth, ideas, users
 from app.core.config import settings
 from app.db import Base, engine
 from app.seed import seed
@@ -19,7 +19,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="Expo AI Summit API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Expo AI Summit Ideas API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -27,7 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-for r in (auth.router, users.router, summit.router):
+for r in (auth.router, users.router, ideas.router):
     app.include_router(r, prefix="/api/v1")
 
 

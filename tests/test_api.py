@@ -70,17 +70,53 @@ async def test_verify_and_reset(client):
     assert r.status_code == 200
 
 
-async def test_schedule_and_roles(client):
+async def test_demo_user_signs_in(client):
+    r = await client.post(
+        "/auth/signin", json={"email": "demo@expo-summit.dev", "password": "demo12345"}
+    )
+    assert r.status_code == 200
+
+
+async def test_ideas_and_voting(client):
+    a = await _signup_signin(client, "a@b.com")
+    b = await _signup_signin(client, "b@b.com")
+    ha = {"Authorization": f"Bearer {a['access_token']}"}
+    hb = {"Authorization": f"Bearer {b['access_token']}"}
+
+    # must be signed in to create; validation applies
+    body = {"title": "Smart queues", "description": "Predict wait times and route visitors."}
+    assert (await client.post("/ideas", json=body)).status_code == 401
+    assert (
+        await client.post("/ideas", json={"title": "x", "description": "y"}, headers=ha)
+    ).status_code == 422
+    r = await client.post("/ideas", json=body, headers=ha)
+    assert r.status_code == 201
+    iid = r.json()["id"]
+    assert r.json()["votes"] == 0
+
+    # one vote per user per idea
+    r = await client.put(f"/ideas/{iid}/vote", headers=ha)
+    assert r.json()["votes"] == 1 and r.json()["voted"]
+    r = await client.put(f"/ideas/{iid}/vote", headers=ha)
+    assert r.json()["votes"] == 1
+    r = await client.put(f"/ideas/{iid}/vote", headers=hb)
+    assert r.json()["votes"] == 2
+
+    # ranking: most voted first, voted flag is per user
+    ideas = (await client.get("/ideas", headers=hb)).json()
+    assert ideas[0]["id"] == iid and ideas[0]["voted"]
+    assert (await client.get("/ideas")).json()[0]["voted"] is False
+
+    r = await client.delete(f"/ideas/{iid}/vote", headers=hb)
+    assert r.json()["votes"] == 1 and not r.json()["voted"]
+
+    # only the author (or admin) can delete
+    assert (await client.delete(f"/ideas/{iid}", headers=hb)).status_code == 403
+    assert (await client.delete(f"/ideas/{iid}", headers=ha)).status_code == 204
+    assert (await client.get(f"/ideas/{iid}")).status_code == 404
+
+
+async def test_roles(client):
     tok = await _signup_signin(client)
     h = {"Authorization": f"Bearer {tok['access_token']}"}
-    sessions = (await client.get("/sessions", headers=h)).json()
-    assert len(sessions) >= 5
-    sid = sessions[0]["id"]
-    assert (await client.put(f"/me/schedule/{sid}", headers=h)).status_code == 204
-    mine = (await client.get("/me/schedule", headers=h)).json()
-    assert [m["id"] for m in mine] == [sid] and mine[0]["saved"]
-    await client.delete(f"/me/schedule/{sid}", headers=h)
-    assert (await client.get("/me/schedule", headers=h)).json() == []
-    # attendee cannot use admin endpoints
     assert (await client.get("/admin/users", headers=h)).status_code == 403
-    assert (await client.get("/speakers")).status_code == 200
